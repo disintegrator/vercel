@@ -521,3 +521,18 @@ export interface FlagDefinition {
 }
 
 export type FlagDefinitions = Record<string, FlagDefinition>;
+
+export interface Chain {
+  /**
+   * The build output to use that references the lambda that will be used to
+   * append to the response. If not provided, the prerender lambda will be
+   * used.
+   */
+  outputPath?: string;
+
+  /**
+   * The headers to send when making the request to append to the response.
+   * If not provided, the headers will be unchanged.
+   */
+  headers?: Record<string, string>;
+}

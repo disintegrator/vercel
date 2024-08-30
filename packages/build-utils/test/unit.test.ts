@@ -502,26 +502,29 @@ it('should support passQuery correctly', async () => {
   );
 });
 
-it('should support experimentalStreamingLambdaPath correctly', async () => {
+it('should support chain correctly', async () => {
   new Prerender({
     expiration: 1,
     fallback: null,
     group: 1,
     bypassToken: 'some-long-bypass-token-to-make-it-work',
-    experimentalStreamingLambdaPath: undefined,
+    chain: undefined,
   });
   new Prerender({
     expiration: 1,
     fallback: null,
     group: 1,
     bypassToken: 'some-long-bypass-token-to-make-it-work',
-    experimentalStreamingLambdaPath: '/some/path/to/lambda',
+    chain: { headers: { 'x-nextjs-data': 'true' } },
   });
   new Prerender({
     expiration: 1,
     fallback: null,
     group: 1,
     bypassToken: 'some-long-bypass-token-to-make-it-work',
+    chain: {
+      headers: { 'x-nextjs-data': 'true', 'x-nextjs-data-2': 'true' },
+    },
   });
 
   expect(() => {
@@ -531,10 +534,20 @@ it('should support experimentalStreamingLambdaPath correctly', async () => {
       group: 1,
       bypassToken: 'some-long-bypass-token-to-make-it-work',
       // @ts-expect-error testing invalid field
-      experimentalStreamingLambdaPath: 1,
+      chain: 'true',
+    });
+  }).toThrowError('The `chain` argument for `Prerender` must be an object.');
+  expect(() => {
+    new Prerender({
+      expiration: 1,
+      fallback: null,
+      group: 1,
+      bypassToken: 'some-long-bypass-token-to-make-it-work',
+      // @ts-expect-error testing invalid field
+      chain: { headers: 'true' },
     });
   }).toThrowError(
-    `The \`experimentalStreamingLambdaPath\` argument for \`Prerender\` must be a string.`
+    'The `chain.headers` argument for `Prerender` must be an object.'
   );
 });
 
