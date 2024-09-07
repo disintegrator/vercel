@@ -465,7 +465,7 @@ describe('PPR', () => {
   it('should have the same lambda for revalidation and resume', async () => {
     const {
       buildResult: { output },
-    } = await runBuildLambda(path.join(__dirname, 'ppr'));
+    } = await runBuildLambda(path.join(__dirname, 'ppr-legacy'));
 
     // Validate that there are only the two lambdas created.
     const lambdas = new Set();
@@ -487,5 +487,32 @@ describe('PPR', () => {
     expect(output['_next/postponed/resume/index'].type).toBe('Lambda');
 
     expect(output['index'].lambda).toBe(output['_next/postponed/resume/index']);
+  });
+
+  it('should have the chain mirrored to the experimentalStreamingLambdaPath', async () => {
+    const {
+      buildResult: { output },
+    } = await runBuildLambda(path.join(__dirname, 'ppr'));
+
+    // Validate that there are only the two lambdas created.
+    const lambdas = new Set();
+    for (const key of Object.keys(output)) {
+      if (output[key].type === 'Lambda') {
+        lambdas.add(output[key]);
+      }
+    }
+
+    expect(lambdas.size).toBe(2);
+
+    expect(output['index']).toBeDefined();
+    expect(output['index'].type).toBe('Prerender');
+    expect(output['index'].experimentalStreamingLambdaPath).toBeDefined();
+    expect(output['index'].chain?.outputPath).toBeDefined();
+    expect(output['index'].experimentalStreamingLambdaPath).toBe(
+      output['index'].chain?.outputPath
+    );
+    expect(output['index'].chain?.outputPath).toBe('index');
+
+    expect(output['_next/postponed/resume/index']).toBeUndefined();
   });
 });
